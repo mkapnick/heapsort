@@ -30,7 +30,7 @@ public class Solution
      *
      * @return A type safe Heap object
      */
-    private static Heap<Number> setUp() throws Exception
+    private static Heap <Number> setUp() throws Exception
     {
 
         BufferedReader      bufferedReader;
@@ -103,25 +103,25 @@ public class Solution
     /******************************************************************************************
      *  An abstraction of the Heap data structure
      *
-     *  @param <Number> Type safety.
+     *  @param <T> Type safety.
      *****************************************************************************************/
-    public static abstract class Heap <Number>
+    public static abstract class Heap <T extends Number>
     {
-        protected final ArrayList<Double>     values;
-        protected ArrayList <Double>          heap;
-        protected final int                   size;
-        protected int                         count;
+        protected final ArrayList<T>            values;
+        protected ArrayList <T>                 heap;
+        protected final int                     size;
+        protected int                           count;
 
         /**
          * Explicit value constructor
          *
          * @param values A list of values inserted by the user
          */
-        public Heap(ArrayList<Double> values)
+        public Heap(ArrayList<T> values)
         {
             this.values         = values;
             this.size           = values.size();
-            this.heap           = new ArrayList<Double>();
+            this.heap           = new ArrayList<T>();
             this.count          = 0;
         }
 
@@ -130,7 +130,7 @@ public class Solution
          *
          * @param value the value to be inserted into the heap
          */
-        public void insert(double value)
+        public void insert(T value)
         {
             this.heap.add(value);
             siftUp(count);
@@ -158,7 +158,7 @@ public class Solution
          *
          * @return the first value in the heap
          */
-        public double peek()
+        public T peek()
         {
             return this.heap.get(0);
         }
@@ -168,9 +168,9 @@ public class Solution
          *
          * @return the first value from the heap
          */
-        public double remove()
+        public T remove()
         {
-            double value;
+            T value;
             value = this.heap.get(0);
 
             count--;
@@ -215,11 +215,11 @@ public class Solution
      *  A concrete Heap class
      *
      *
-     * @param <Number> Type safety
+     * @param <T> Type safety
      *****************************************************************************************/
-    public static class MaxHeap <Number>  extends Heap <Number>
+    public static class MaxHeap <T extends Number>  extends Heap <T>
     {
-        public MaxHeap(ArrayList<Double> values)
+        public MaxHeap(ArrayList<T> values)
         {
            super(values);
         }
@@ -239,11 +239,11 @@ public class Solution
 
             largest     = index;
 
-            if (childLeft < count && this.heap.get(childLeft) >= this.heap.get(largest))
+            if (childLeft < count && this.heap.get(childLeft).doubleValue() >= this.heap.get(largest).doubleValue())
             {
                 if(childRight < count)
                 {
-                    if (this.heap.get(childLeft) >= this.heap.get(childRight))
+                    if (this.heap.get(childLeft).doubleValue() >= this.heap.get(childRight).doubleValue())
                     {
                         largest = childLeft;
                         ok      = true;
@@ -257,12 +257,12 @@ public class Solution
                 }
             }
 
-            if (childRight < count && !ok && this.heap.get(childRight) >= this.heap.get(largest))
+            if (childRight < count && !ok && this.heap.get(childRight).doubleValue() >= this.heap.get(largest).doubleValue())
                 largest = childRight;
 
             if (largest != index)
             {
-                double tmp = this.heap.get(index);
+                T tmp = this.heap.get(index);
                 this.heap.set(index, this.heap.get(largest));
                 this.heap.set(largest, tmp);
 
@@ -281,9 +281,9 @@ public class Solution
                  int parent;
                  parent = (index -1) / 2;
 
-                 if(this.heap.get(index) >= this.heap.get(parent))
+                 if(this.heap.get(index).doubleValue() >= this.heap.get(parent).doubleValue())
                  {
-                     double temp = this.heap.get(index);
+                     T temp = this.heap.get(index);
                      this.heap.set(index, this.heap.get(parent));
                      this.heap.set(parent, temp);
 
@@ -297,11 +297,11 @@ public class Solution
      *   A concrete heap class
      *
      *
-     * @param <Number> Type safety
+     * @param <T> Type safety
      *****************************************************************************************/
-    public static class MinHeap <Number> extends Heap <Number>
+    public static class MinHeap <T extends Number> extends Heap <T>
     {
-        public MinHeap(ArrayList<Double> list)
+        public MinHeap(ArrayList<T> list)
         {
            super(list);
         }
@@ -321,11 +321,11 @@ public class Solution
 
             largest     = index;
 
-            if (childLeft < count && this.heap.get(childLeft) <= this.heap.get(largest))
+            if (childLeft < count && this.heap.get(childLeft).doubleValue() <= this.heap.get(largest).doubleValue())
             {
                 if(childRight < count)
                 {
-                    if (this.heap.get(childLeft) <= this.heap.get(childRight))
+                    if (this.heap.get(childLeft).doubleValue() <= this.heap.get(childRight).doubleValue())
                     {
                         largest = childLeft;
                         ok      = true;
@@ -341,12 +341,12 @@ public class Solution
 
 
 
-            else if (childRight < count && !ok && this.heap.get(childRight) <= this.heap.get(largest))
+            else if (childRight < count && !ok && this.heap.get(childRight).doubleValue() <= this.heap.get(largest).doubleValue())
                 largest = childRight;
 
             if (largest != index)
             {
-                double tmp = this.heap.get(index);
+                T tmp = this.heap.get(index);
                 this.heap.set(index, this.heap.get(largest));
                 this.heap.set(largest, tmp);
 
@@ -364,9 +364,9 @@ public class Solution
                 int parent;
                 parent = (index -1) / 2;
 
-                if(this.heap.get(index) <= this.heap.get(parent))
+                if(this.heap.get(index).doubleValue() <= this.heap.get(parent).doubleValue())
                 {
-                    double temp = this.heap.get(index);
+                    T temp = this.heap.get(index);
                     this.heap.set(index, this.heap.get(parent));
                     this.heap.set(parent, temp);
 
