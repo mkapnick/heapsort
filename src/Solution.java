@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- *
- * User: Michael Kapnick
- * Date: 2/16/14
  * Squarespace solution
+ * User: Michael Kapnick
+ * Email: kapnicmt@dukes.jmu.edu
+ * Date: 2/16/14
+ * Version: v1
  */
 public class Solution
 {
@@ -16,35 +17,37 @@ public class Solution
         /* Enter your code here. Read input from STDIN. Print output to STDOUT */
         System.out.println(" -- START -- ");
 
-        Heap <Number> heap;
+        Heap heap;
+        heap = heapFactory();
 
-        heap = setUp();
         heap.organizeIntoHeap();
         heap.removeAndOutput();
-
 
     }
 
     /**
-     * Read input from SDTIN and create a Heap object as necessary
+     * Read input from STDIN and construct a Heap object
      *
      * @return A type safe Heap object
      */
-    private static Heap <Number> setUp() throws Exception
+    private static Heap heapFactory() throws Exception
     {
-
         BufferedReader      bufferedReader;
         Scanner             keyboard;
         String              heapStructure;
-        ArrayList<Double>   list;
+        ArrayList           list;
         Heap                heap;
         String              heapData;
+        boolean             isHeapIntegers;
+        boolean             isHeapDoubles;
 
         keyboard            = new Scanner(System.in);
-        list                = new ArrayList<Double>();
-        bufferedReader      = new BufferedReader (new InputStreamReader(System.in));
+        list                = new ArrayList();
+        bufferedReader      = new BufferedReader(new InputStreamReader(System.in));
+        isHeapIntegers      = false;
+        isHeapDoubles       = false;
 
-        // determine max-heap or min-heap, check for errors
+        // determine max-heap or min-heap, and check for errors
         do
         {
             heapStructure   = keyboard.next();
@@ -55,28 +58,49 @@ public class Solution
         {
             try
             {
-                list.add(Double.parseDouble(heapData)); //treat integers as doubles
+                list.add(Integer.parseInt(heapData)); //integer input
+                isHeapIntegers = true;
             }
             catch(Exception e)
             {
                 try
                 {
-                    //user entered a string
-                    heapData = heapData.replaceAll("^\"|\"$", "");
-                    list.add(Double.parseDouble(heapData));
+                    list.add(Double.parseDouble(heapData));  //double input
+                    isHeapDoubles = true;
                 }
-
                 catch (Exception ex)
                 {
-                    System.out.println("Bad input");
+                    try
+                    {
+                        list.add(heapData);  //string input
+                    }
+                    catch(Exception exc)
+                    {
+                        System.out.println("Bad input");
+                    }
                 }
             }
         }
 
+        // Create Heap @ run time
         if(heapStructure.equalsIgnoreCase("max-heap"))
-            heap = new MaxHeap<Double>(list);
+        {
+            if(isHeapIntegers)
+                heap = new MaxHeap<Integer>(list);
+            else if(isHeapDoubles)
+                heap = new MaxHeap<Double>(list);
+            else
+                heap = new MaxHeap<String>(list);
+        }
         else
-            heap = new MinHeap<Double>(list);
+        {
+            if(isHeapIntegers)
+                heap = new MinHeap<Integer>(list);
+            else if(isHeapDoubles)
+                heap = new MinHeap<Double>(list);
+            else
+                heap = new MinHeap<String>(list);
+        }
 
         return heap;
     }
@@ -103,9 +127,9 @@ public class Solution
     /******************************************************************************************
      *  An abstraction of the Heap data structure
      *
-     *  @param <T> Type safety.
+     *  @param <T> Any object that is comparable
      *****************************************************************************************/
-    public static abstract class Heap <T extends Number>
+    public static abstract class Heap <T extends Comparable<T>>
     {
         protected final ArrayList<T>            values;
         protected ArrayList <T>                 heap;
@@ -135,7 +159,6 @@ public class Solution
             this.heap.add(value);
             siftUp(count);
             count++;
-
         }
 
         /**
@@ -185,7 +208,7 @@ public class Solution
         }
 
         /**
-         *  Remove and output each element in the heap
+         *  Remove and output each element from the heap
          *
          */
         public void removeAndOutput()
@@ -215,18 +238,25 @@ public class Solution
      *  A concrete Heap class
      *
      *
-     * @param <T> Type safety
+     * @param <T> Any object that is comparable
      *****************************************************************************************/
-    public static class MaxHeap <T extends Number>  extends Heap <T>
+    public static class MaxHeap <T extends Comparable<T>>  extends Heap <T>
     {
+        /**
+         * Explicit value constructor; sets up an arraylist
+         * as the underlying data structure
+         *
+         * @param values list of values entered by the user
+         */
         public MaxHeap(ArrayList<T> values)
         {
            super(values);
         }
 
         /**
+         * Place an element in its correct position, following max heap rules
          *
-         * @param index
+         * @param index index into the heap
          */
         public void siftDown(int index)
         {
@@ -239,11 +269,11 @@ public class Solution
 
             largest     = index;
 
-            if (childLeft < count && this.heap.get(childLeft).doubleValue() >= this.heap.get(largest).doubleValue())
+            if (childLeft < count && this.heap.get(childLeft).compareTo(this.heap.get(largest)) >= 0)
             {
                 if(childRight < count)
                 {
-                    if (this.heap.get(childLeft).doubleValue() >= this.heap.get(childRight).doubleValue())
+                    if (this.heap.get(childLeft).compareTo(this.heap.get(childRight)) >= 0)
                     {
                         largest = childLeft;
                         ok      = true;
@@ -257,7 +287,7 @@ public class Solution
                 }
             }
 
-            if (childRight < count && !ok && this.heap.get(childRight).doubleValue() >= this.heap.get(largest).doubleValue())
+            if (childRight < count && !ok && this.heap.get(childRight).compareTo(this.heap.get(largest)) >= 0)
                 largest = childRight;
 
             if (largest != index)
@@ -271,8 +301,9 @@ public class Solution
         }
 
         /**
+         * Place an element in its correct position, following max heap rules
          *
-         * @param index
+         * @param index index into the heap
          */
         public void siftUp(int index)
         {
@@ -281,7 +312,7 @@ public class Solution
                  int parent;
                  parent = (index -1) / 2;
 
-                 if(this.heap.get(index).doubleValue() >= this.heap.get(parent).doubleValue())
+                 if(this.heap.get(index).compareTo(this.heap.get(parent)) >= 0)
                  {
                      T temp = this.heap.get(index);
                      this.heap.set(index, this.heap.get(parent));
@@ -297,18 +328,25 @@ public class Solution
      *   A concrete heap class
      *
      *
-     * @param <T> Type safety
+     * @param <T> Any object that is comparable
      *****************************************************************************************/
-    public static class MinHeap <T extends Number> extends Heap <T>
+    public static class MinHeap <T extends Comparable<T>> extends Heap <T>
     {
-        public MinHeap(ArrayList<T> list)
+        /**
+         * Explicit value constructor; sets up an arraylist
+         * as the underlying data structure
+         *
+         * @param values list of values entered by the user
+         */
+        public MinHeap(ArrayList<T> values)
         {
-           super(list);
+           super(values);
         }
 
         /**
+         * Place an element in its correct position, following min heap rules
          *
-         * @param index
+         * @param index index into the heap
          */
         public void siftDown(int index)
         {
@@ -321,11 +359,11 @@ public class Solution
 
             largest     = index;
 
-            if (childLeft < count && this.heap.get(childLeft).doubleValue() <= this.heap.get(largest).doubleValue())
+            if (childLeft < count && this.heap.get(childLeft).compareTo(this.heap.get(largest)) <= 0)
             {
                 if(childRight < count)
                 {
-                    if (this.heap.get(childLeft).doubleValue() <= this.heap.get(childRight).doubleValue())
+                    if (this.heap.get(childLeft).compareTo(this.heap.get(childRight)) <= 0)
                     {
                         largest = childLeft;
                         ok      = true;
@@ -339,9 +377,7 @@ public class Solution
                 }
             }
 
-
-
-            else if (childRight < count && !ok && this.heap.get(childRight).doubleValue() <= this.heap.get(largest).doubleValue())
+            else if (childRight < count && !ok && this.heap.get(childRight).compareTo(this.heap.get(largest)) <= 0)
                 largest = childRight;
 
             if (largest != index)
@@ -354,8 +390,9 @@ public class Solution
             }
         }
         /**
+         * Place an element in its correct position, following min heap rules
          *
-         * @param index
+         * @param index index into the heap
          */
         public void siftUp(int index)
         {
@@ -364,7 +401,7 @@ public class Solution
                 int parent;
                 parent = (index -1) / 2;
 
-                if(this.heap.get(index).doubleValue() <= this.heap.get(parent).doubleValue())
+                if(this.heap.get(index).compareTo(this.heap.get(parent)) <= 0)
                 {
                     T temp = this.heap.get(index);
                     this.heap.set(index, this.heap.get(parent));
