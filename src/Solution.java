@@ -7,7 +7,7 @@ import java.util.Scanner;
  * Squarespace solution
  * User: Michael Kapnick
  * Email: kapnicmt@dukes.jmu.edu
- * Date: 2/16/14
+ * Date: 2/17/14
  * Version: v1
  */
 public class Solution
@@ -20,9 +20,10 @@ public class Solution
         Heap heap;
         heap = heapFactory();
 
-        heap.organizeIntoHeap();
-        heap.removeAndOutput();
-
+        for (int i =0; i < heap.size(); i++)
+        {
+            System.out.println(heap.remove());
+        }
     }
 
     /**
@@ -32,17 +33,17 @@ public class Solution
      */
     private static Heap heapFactory() throws Exception
     {
-        BufferedReader      bufferedReader;
-        Scanner             keyboard;
-        String              heapStructure;
-        ArrayList           list;
-        Heap                heap;
-        String              heapData;
-        boolean             isHeapIntegers;
-        boolean             isHeapDoubles;
+        BufferedReader          bufferedReader;
+        Scanner                 keyboard;
+        String                  heapStructure;
+        ArrayList<Comparable>   list;
+        Heap                    heap;
+        String                  heapData;
+        boolean                 isHeapIntegers;
+        boolean                 isHeapDoubles;
 
         keyboard            = new Scanner(System.in);
-        list                = new ArrayList();
+        list                = new ArrayList<Comparable>();
         bufferedReader      = new BufferedReader(new InputStreamReader(System.in));
         isHeapIntegers      = false;
         isHeapDoubles       = false;
@@ -86,20 +87,38 @@ public class Solution
         if(heapStructure.equalsIgnoreCase("max-heap"))
         {
             if(isHeapIntegers)
-                heap = new MaxHeap<Integer>(list);
+                heap = new MaxHeap<Integer>();
             else if(isHeapDoubles)
-                heap = new MaxHeap<Double>(list);
+                heap = new MaxHeap<Double>();
             else
-                heap = new MaxHeap<String>(list);
+                heap = new MaxHeap<String>();
         }
         else
         {
             if(isHeapIntegers)
-                heap = new MinHeap<Integer>(list);
+                heap = new MinHeap<Integer>();
             else if(isHeapDoubles)
-                heap = new MinHeap<Double>(list);
+                heap = new MinHeap<Double>();
             else
-                heap = new MinHeap<String>(list);
+                heap = new MinHeap<String>();
+        }
+
+        return insertValuesIntoHeap(heap, list);
+    }
+
+
+    /**
+     * Insert values from a list into a heap
+     *
+     * @param heap A heap
+     * @param list A list
+     * @return A fully structured heap, based on min or max rules
+     */
+    private static Heap insertValuesIntoHeap(Heap heap, ArrayList<Comparable>list)
+    {
+        for (int i =0; i < list.size(); i ++)
+        {
+            heap.insert(list.get(i));
         }
 
         return heap;
@@ -131,22 +150,18 @@ public class Solution
      *****************************************************************************************/
     public static abstract class Heap <T extends Comparable<T>>
     {
-        protected final ArrayList<T>            values;
         protected ArrayList <T>                 heap;
-        protected final int                     size;
+        protected int                           size;
         protected int                           count;
 
         /**
-         * Explicit value constructor
-         *
-         * @param values A list of values inserted by the user
+         * Constructs a heap object
          */
-        public Heap(ArrayList<T> values)
+        public Heap()
         {
-            this.values         = values;
-            this.size           = values.size();
             this.heap           = new ArrayList<T>();
             this.count          = 0;
+            this.size           = 0;
         }
 
         /**
@@ -159,21 +174,7 @@ public class Solution
             this.heap.add(value);
             siftUp(count);
             count++;
-        }
-
-        /**
-         * Organize linear arraylist of values into a heap structure
-         *
-         */
-        public void organizeIntoHeap()
-        {
-            if(this.size > 0)
-            {
-                for(int i =0; i < this.size; i++)
-                {
-                    this.insert(this.values.get(i));
-                }
-            }
+            size++;
         }
 
         /**
@@ -183,7 +184,13 @@ public class Solution
          */
         public T peek()
         {
-            return this.heap.get(0);
+            T root = null;
+
+            if(this.size > 0)
+                root = this.heap.get(0);
+
+            return root;
+
         }
 
         /**
@@ -205,18 +212,6 @@ public class Solution
 
             return value;
 
-        }
-
-        /**
-         *  Remove and output each element from the heap
-         *
-         */
-        public void removeAndOutput()
-        {
-            for(int i =0; i < this.size(); i++)
-            {
-                System.out.println(this.remove());
-            }
         }
 
         public abstract void siftDown(int index);
@@ -243,14 +238,11 @@ public class Solution
     public static class MaxHeap <T extends Comparable<T>>  extends Heap <T>
     {
         /**
-         * Explicit value constructor; sets up an arraylist
-         * as the underlying data structure
-         *
-         * @param values list of values entered by the user
+         * Constructs a Max heap object
          */
-        public MaxHeap(ArrayList<T> values)
+        public MaxHeap()
         {
-           super(values);
+            super();
         }
 
         /**
@@ -307,7 +299,7 @@ public class Solution
          */
         public void siftUp(int index)
         {
-             if (index > 0 && index < size)
+             if (index > 0)
              {
                  int parent;
                  parent = (index -1) / 2;
@@ -333,14 +325,11 @@ public class Solution
     public static class MinHeap <T extends Comparable<T>> extends Heap <T>
     {
         /**
-         * Explicit value constructor; sets up an arraylist
-         * as the underlying data structure
-         *
-         * @param values list of values entered by the user
+         * Constructs a Min heap object
          */
-        public MinHeap(ArrayList<T> values)
+        public MinHeap()
         {
-           super(values);
+           super();
         }
 
         /**
@@ -396,7 +385,7 @@ public class Solution
          */
         public void siftUp(int index)
         {
-            if (index > 0 && index < size)
+            if (index > 0)
             {
                 int parent;
                 parent = (index -1) / 2;
